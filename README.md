@@ -16,6 +16,16 @@ A flexible Python framework for generating AWS cost reports with CSV export capa
 
 ### Installation
 
+Using uv (recommended):
+
+```bash
+uv venv
+source .venv/bin/activate
+uv sync
+```
+
+Alternative with pip:
+
 ```bash
 pip install boto3
 ```
@@ -24,13 +34,13 @@ pip install boto3
 
 ```bash
 # RDS costs for last 30 days
-python cost_cli.py --service rds --days 30 --group-by usage_type
+uv run cost-tools --service rds --days 30 --group-by usage_type
 
 # EC2 costs by instance type for specific account  
-python cost_cli.py --service ec2 --account 123456789012 --group-by instance_type
+uv run cost-tools --service ec2 --account 123456789012 --group-by instance_type
 
 # Daily costs for last week
-python cost_cli.py --days 7 --granularity daily --group-by service
+uv run cost-tools --days 7 --granularity daily --group-by service
 ```
 
 ## CLI Reference
@@ -58,10 +68,16 @@ python cost_cli.py --days 7 --granularity daily --group-by service
 
 ## Examples
 
+Tip: You can run all packaged examples to generate sample reports (update account IDs and tag values in your environment first):
+
+```bash
+uv run cost-tools-examples
+```
+
 ### Your Original Requirement
 ```bash
 # RDS costs by usage type, filtered by customer tag and account
-python cost_cli.py \
+uv run cost-tools \
   --service rds \
   --account 123456789012 \
   --filters "customer=CustomerName" \
@@ -72,20 +88,20 @@ python cost_cli.py \
 ### More Examples
 ```bash
 # Multi-service comparison
-python cost_cli.py \
+uv run cost-tools \
   --filters "service=Amazon Relational Database Service,Amazon Elastic Compute Cloud - Compute" \
   --group-by service \
   --days 30
 
 # Regional breakdown with daily granularity
-python cost_cli.py \
+uv run cost-tools \
   --service ec2 \
   --group-by region \
   --granularity daily \
   --days 7
 
 # Multiple customers and services
-python cost_cli.py \
+uv run cost-tools \
   --filters "customer=CustomerA,CustomerB;service=Amazon Relational Database Service" \
   --group-by usage_type \
   --days 30
@@ -94,7 +110,7 @@ python cost_cli.py \
 ## Programmatic Usage
 
 ```python
-from aws_cost_reporter import AWSCostReporter, ReportConfig, Granularity, GroupBy, FilterDimension
+from aws_cost_tools import AWSCostReporter, ReportConfig, Granularity, GroupBy, FilterDimension
 
 # Create reporter
 reporter = AWSCostReporter()
@@ -162,9 +178,15 @@ The framework supports:
 
 ## Files
 
-- `aws_cost_reporter.py`: Main framework classes
-- `cost_cli.py`: Command-line interface
-- `examples.py`: Programmatic examples
+- `aws_cost_tools/`: Package
+  - `reporter.py`: Main framework classes
+  - `cli.py`: Command-line interface (exposed as `cost-tools`)
+  - `examples.py`: Programmatic examples (exposed as `cost-tools-examples`)
+- `aws_cost_reporter.py`: Legacy module (kept for compatibility)
+- `cost_cli.py`: Legacy CLI script (kept for compatibility)
+- `examples.py`: Legacy examples (kept for compatibility)
+- `pyproject.toml`: Project metadata and dependencies (uv-compatible)
+- `uv.lock`: Resolved dependency lockfile
 - `README.md`: This documentation
 
 ## AWS Permissions Required

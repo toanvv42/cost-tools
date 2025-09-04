@@ -284,50 +284,9 @@ def create_sample_configs():
     }
 
 def main():
-    parser = argparse.ArgumentParser(description='AWS Cost Reporter')
-    parser.add_argument('--profile', help='AWS profile name')
-    parser.add_argument('--list-accounts', action='store_true', 
-                       help='List all linked accounts')
-    parser.add_argument('--list-services', action='store_true',
-                       help='List all available services') 
-    parser.add_argument('--sample-reports', action='store_true',
-                       help='Generate sample reports')
-    
-    args = parser.parse_args()
-    
-    reporter = AWSCostReporter(profile_name=args.profile)
-    
-    if args.list_accounts:
-        accounts = reporter.get_linked_accounts()
-        print("Available Linked Accounts:")
-        for account_id, name in accounts.items():
-            print(f"  {account_id}: {name}")
-        return
-    
-    if args.list_services:
-        services = reporter.get_services()
-        print("Available Services:")
-        for service in sorted(services):
-            print(f"  {service}")
-        return
-        
-    if args.sample_reports:
-        print("Generating sample reports...")
-        configs = create_sample_configs()
-        
-        for report_name, config in configs.items():
-            print(f"Generating {report_name}...")
-            try:
-                data = reporter.generate_report(config)
-                output_file = f"{report_name}_sample.csv"
-                reporter.export_to_csv(data, output_file)
-            except Exception as e:
-                print(f"Error generating {report_name}: {e}")
-        return
-    
-    print("Use --sample-reports to generate example reports")
-    print("Use --list-accounts to see available accounts")
-    print("Use --list-services to see available services")
+    # Delegate to the packaged CLI to avoid duplication
+    from aws_cost_tools.cli import main as pkg_main
+    return pkg_main()
 
 if __name__ == "__main__":
     main()
